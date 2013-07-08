@@ -1,23 +1,24 @@
-import bleach, bs4, nltk, operator, urllib2
+import bleach, bs4, json, nltk, operator, urllib2
 
 from mantisshrimp.parsing_engine.GeocoderResult import *
 
 class Document(object):
 
     def __init__(self, source, href):
-        # class properties init
         self.source = source
         self.href = href
-        self.html_content = ''
         self.stripped_content = ''
         self.search_terms = {}
         self.ordered_search_terms = []
         self.locations = []
 
-    def grabContent(self, content_search_function):
+    def buildWordCollection(self, content_search_function):
         '''
         Open url provided at init time and attempt to grab content based
         on the given content_search_function.
+
+        Then, build a word collection to perform location searches on. Uses the
+        content property on this object.
 
         content_search function = a function that takes one argument, raw html
             to search through, and returns the block of html containing the text
@@ -29,23 +30,15 @@ class Document(object):
         html = response.read()
 
         # use provided search function to find content containing locations
-        self.html_content = content_search_function(html)
-
-        return self
-
-    def buildWordCollections(self):
-        '''
-        Build a word collection to perform location searches on. Uses the
-        content property on this object.
-        '''
+        html_content = content_search_function(html)
 
         # make sure there is content to gather data from
-        if len(self.html_content) < 1:
+        if len(html_content) < 1:
             print('There is no content to build word collection from!')
             return
         
         # clean up html out of content
-        stripped_content = bleach.clean(self.html_content, tags=[], strip=True)
+        stripped_content = bleach.clean(html_content, tags=[], strip=True)
         
         # split up content into words
         all_words = ''.join(e for e in stripped_content \
@@ -87,7 +80,8 @@ class Document(object):
 
         return self
         
-    def findLocations(self, num_locations_to_test):
+    def findLocations(self, num_locations_to_test,
+                      geocoder = geopy.geocoders.GoogleV3):
         '''
         Search through ordered list of search terms up to
         num_locations_to_test and use a geocoder service to attempt to get
@@ -106,7 +100,13 @@ class Document(object):
             location = kv[0]
 
             # test location using geocoder
-            result = GeocoderResult(geopy.geocoders.GoogleV3()).find(location)
+            result = GeocoderResult(geocoder).find(location)
             self.locations.append(result)
 
         return self
+
+    def __str__(self):
+        return json.dumps(self.__dict__)
+
+    def __repr__(self):
+        return self.__str__()

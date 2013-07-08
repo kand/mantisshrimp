@@ -25,12 +25,11 @@ for i in range(len(feed.entries)):
     # build document info
     doc = Document(SOURCE, entry.link)
     doc \
-        .grabContent(ContentSearchFunctions.yahoo) \
-        .buildWordCollections() \
+        .buildWordCollection(ContentSearchFunctions.yahoo) \
         .findLocations(MAX_LOCATIONS_TO_SEARCH)
 
     docs.append(doc)
 
 # start a flask webservice to allow results to be viewed
-from mantisshrimp.webservice import app
-app.run(host='localhost', port=5000)
+#from mantisshrimp.webservice import app
+#app.run(host='localhost', port=5000)

@@ -1,19 +1,28 @@
-import geopy
+import geopy, json
 
 class GeocoderResult(object):
 
-    def __init__(self, geocoder):
+    def __init__(self, geocoder = geopy.geocoders.GoogleV3):
         # class properties init 
-        self.geocoder = geocoder
+        self.geocoder = geocoder()
+        self.raw_place = None
         self.place = None
         self.coords = None
         self.success = False
-        self.fail_message = None
+        self.fail_message = ''
 
-    def find(self, location, print_exception=False):
+    def find(self, location,
+             print_exception = False,
+             geocoder = None):
         '''
         Populate instance with data from geocoder using given location.
         '''
+
+        # make sure geocoder is set
+        if geocoder is None:
+            geocoder = self.geocoder
+
+        self.raw_place = location
         
         try:
             # use geocoder to find data
@@ -33,11 +42,15 @@ class GeocoderResult(object):
         return self
 
     def __str__(self):
-        return str(self.success) + ','\
-               + str(self.place) + ',' \
-               + str(self.coords) + ',' \
-               + str(self.fail_message) + ',' \
-               + str(self.geocoder)
+        return self.__repr__
 
     def __repr__(self):
-        return self.__str__()
+        return str({
+            "success": 1 if self.success else 0,
+            "raw_place": self.raw_place,
+            "place": self.place,
+            "coords": self.coords,
+            "fail_message": self.fail_message,
+            "geocoder_domain": self.geocoder.domain
+            })
+
