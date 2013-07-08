@@ -1,2 +1,8 @@
 *.pyc
+
+# i hate Apple
 .DS_Store
+
+# ignore virtualenv
+venv*
+
