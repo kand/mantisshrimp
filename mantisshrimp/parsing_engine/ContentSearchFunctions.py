@@ -1,6 +1,5 @@
 import bs4
 
-
 def yahoo(html):
     soup = bs4.BeautifulSoup(html)
     potential_ids = ['mediaarticlebody',

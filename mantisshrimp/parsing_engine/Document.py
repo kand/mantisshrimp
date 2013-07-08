@@ -1,6 +1,6 @@
 import bleach, bs4, nltk, operator, urllib2
 
-from GeocoderResult import *
+from mantisshrimp.parsing_engine.GeocoderResult import *
 
 class Document(object):
 

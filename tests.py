@@ -1,6 +1,7 @@
-import ContentSearchFunctions, feedparser
+import feedparser
 
-from Document import *
+from mantisshrimp.parsing_engine import ContentSearchFunctions
+from mantisshrimp.parsing_engine.Document import *
 
 SOURCE = 'http://news.yahoo.com/rss/us'
 MAX_ARTICLES = 10
