@@ -4,7 +4,7 @@ from mantisshrimp.parsing_engine import ContentSearchFunctions
 from mantisshrimp.parsing_engine.Document import *
 
 SOURCE = 'http://news.yahoo.com/rss/us'
-MAX_ARTICLES = 10
+MAX_ARTICLES = 1
 MAX_LOCATIONS_TO_SEARCH = 4
 
 # get sample data
@@ -31,4 +31,6 @@ for i in range(len(feed.entries)):
 
     docs.append(doc)
 
-# write locations out
+# start a flask webservice to allow results to be viewed
+from mantisshrimp.webservice import app
+app.run(host='localhost', port=5000)
