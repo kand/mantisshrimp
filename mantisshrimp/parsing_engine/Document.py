@@ -1,18 +1,19 @@
 import bleach, bs4, json, nltk, operator, urllib2
 
-from mantisshrimp.parsing_engine.GeocoderResult import *
+from mantisshrimp.utils.CustomJSONEncoder import *
+from mantisshrimp.parsing_engine.Term import *
 
-class Document(object):
+from mantisshrimp.domain.Document import Document as DomainDocument
+
+class Document(DomainDocument):
 
     def __init__(self, source, href):
+        DomainDocument.__init__(self)
+        
         self.source = source
         self.href = href
-        self.stripped_content = ''
-        self.search_terms = {}
-        self.ordered_search_terms = []
-        self.locations = []
-
-    def buildWordCollection(self, content_search_function):
+        
+    def digest(self, content_search_function, num_locations_to_test, geocoder):
         '''
         Open url provided at init time and attempt to grab content based
         on the given content_search_function.
@@ -23,6 +24,11 @@ class Document(object):
         content_search function = a function that takes one argument, raw html
             to search through, and returns the block of html containing the text
             to perform the location search on.
+
+        num_locations_to_test = the maximum number of locations to test against
+            the geocoder.
+
+        geocoder = the geocoder object to use to test locations.
         '''
 
         # open url and get html
@@ -38,7 +44,11 @@ class Document(object):
             return
         
         # clean up html out of content
-        stripped_content = bleach.clean(html_content, tags=[], strip=True)
+        stripped_content = bleach.clean(html_content,
+                                        tags=[],
+                                        attributes=[],
+                                        styles=[],
+                                        strip=True)
         
         # split up content into words
         all_words = ''.join(e for e in stripped_content \
@@ -75,22 +85,10 @@ class Document(object):
 
         # set properties on class
         self.stripped_content = stripped_content
-        self.search_terms = proper_nouns
-        self.ordered_search_terms = by_freq
-
-        return self
-        
-    def findLocations(self, num_locations_to_test,
-                      geocoder = geopy.geocoders.GoogleV3):
-        '''
-        Search through ordered list of search terms up to
-        num_locations_to_test and use a geocoder service to attempt to get
-        lat/lng coordinates.
-        '''
 
         # loop through search and access geocoder services to get lat/lng
         count = 0
-        for kv in self.ordered_search_terms:
+        for kv in by_freq:
             
             # keep track of how many locations we've tested
             count += 1
@@ -100,13 +98,8 @@ class Document(object):
             location = kv[0]
 
             # test location using geocoder
-            result = GeocoderResult(geocoder).find(location)
-            self.locations.append(result)
+            result = Term().find(location, geocoder)
+            self.terms.append(result)
 
         return self
 
-    def __str__(self):
-        return json.dumps(self.__dict__)
-
-    def __repr__(self):
-        return self.__str__()
