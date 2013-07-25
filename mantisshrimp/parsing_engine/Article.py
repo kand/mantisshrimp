@@ -100,6 +100,7 @@ class Article(DomainArticle):
             # test location using geocoder
             term = Term()
             term.find(location, geocoder)
+# TODO : should keep terms that have failed
             if not term.fail_message:
                 relationship = ProbabilityRelation(self, term, "CONTAINS")
                 self.relationships.append(relationship)

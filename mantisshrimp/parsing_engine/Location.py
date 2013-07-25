@@ -21,6 +21,8 @@ class Location(DomainLocation):
         self.geocoder_domain = ready_geocoder.domain
 
 # TODO : search db for this location, allow skip over geocoding
+# TODO : having multiple results for one location is an error, will not
+#   be tracked currently, this is incorrect behavior on my part
 
         try:
             # use geocoder to find data
