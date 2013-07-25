@@ -1,6 +1,0 @@
-class DBDocument(Document):
-    source = StringField()
-    href = StringField()
-    stripped_content = StringField()
-    terms = ListField(ReferenceField(DBTerm))
-    likelyhood = FloatField(min_value=0.0, max_value=1.0)
