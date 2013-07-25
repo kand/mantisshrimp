@@ -1,9 +1,7 @@
 import feedparser, geopy
 
 from mantisshrimp.parsing_engine import ContentSearchFunctions
-from mantisshrimp.parsing_engine.Document import *
-from mantisshrimp.database.MongoDB import *
-
+from mantisshrimp.parsing_engine.Article import *
 SOURCE = 'http://news.yahoo.com/rss/us'
 MAX_ARTICLES = 1
 MAX_LOCATIONS_TO_SEARCH = 4
@@ -24,18 +22,17 @@ for i in range(len(feed.entries)):
         break
 
     # build document info
-    doc = Document(SOURCE, entry.link)
+    doc = Article(SOURCE, entry.link)
     doc.digest(ContentSearchFunctions.yahoo,
                MAX_LOCATIONS_TO_SEARCH,
                geopy.geocoders.GoogleV3)
 
     docs.append(doc)
 
-# save docs to database
-db = MongoDB()
-for i in range(len(docs)):
-    db.insert(docs[i])
+# TODO : save docs to database
+for doc in docs:
+    print doc.toDict()
 
-# start a flask webservice to allow results to be viewed
+# TODO: start a flask webservice to allow results to be viewed
 #from mantisshrimp.webservice import app
 #app.run(host='localhost', port=5000)

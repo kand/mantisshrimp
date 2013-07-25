@@ -1,15 +1,15 @@
-import geopy, json
+import geopy
 
-from mantisshrimp.utils.CustomJSONEncoder import *
-
+from mantisshrimp.domain.ProbabilityRelation import *
 from mantisshrimp.domain.Term import Term as DomainTerm
+from mantisshrimp.parsing_engine.Location import *
 
 class Term(DomainTerm):
 
     def __init__(self):
         DomainTerm.__init__(self)
 
-    def find(self, location, geocoder, print_exception = False):
+    def find(self, location, geocoder):
         '''
         Populate instance with data from geocoder using given location.
         '''
@@ -18,24 +18,17 @@ class Term(DomainTerm):
         self.raw_term = location
 
 # TODO : search db for this term, allow us to skip over geocoding
-
-        # prepare geocoder
-        ready_geocoder = geocoder()
-        self.geocoder_domain = ready_geocoder.domain
-        
-        try:
-            # use geocoder to find data
-            geocode_result = ready_geocoder.geocode(location)
-
-            # no exceptions, set class variables
+               
+        geocoded_location = Location()
+        failed = geocoded_location.resolve(location, geocoder)
+        if not failed:
+            # successfully geocoded, add a relationship
             self.success = True
-            self.place = geocode_result[0]
-            self.coords = geocode_result[1]
-            
-        except Exception as e:
-            # a failure occured, set variables as necessary
-            self.fail_message = str(e)
-            if print_exception:
-                print('Tried "%s" and failed: %s' % (location, e))
+            relationship = ProbabilityRelation(self, geocoded_location)
+            self.relationships.append(relationship)
+        else:
+            self.fail_message = failed
+# TODO : logging here
+            print "Given location '" + location + "' was not resolved."
 
         return self

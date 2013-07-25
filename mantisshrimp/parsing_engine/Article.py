@@ -1,14 +1,14 @@
 import bleach, bs4, json, nltk, operator, urllib2
 
-from mantisshrimp.utils.CustomJSONEncoder import *
+from mantisshrimp.domain.ProbabilityRelation import *
 from mantisshrimp.parsing_engine.Term import *
 
-from mantisshrimp.domain.Document import Document as DomainDocument
+from mantisshrimp.domain.Article import Article as DomainArticle
 
-class Document(DomainDocument):
+class Article(DomainArticle):
 
     def __init__(self, source, href):
-        DomainDocument.__init__(self)
+        DomainArticle.__init__(self)
         
         self.source = source
         self.href = href
@@ -98,8 +98,10 @@ class Document(DomainDocument):
             location = kv[0]
 
             # test location using geocoder
-            result = Term().find(location, geocoder)
-            self.terms.append(result)
+            term = Term()
+            term.find(location, geocoder)
+            relationship = ProbabilityRelation(self, term)
+            self.relationships.append(relationship)
 
         return self
 
