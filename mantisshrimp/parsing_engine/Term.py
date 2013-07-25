@@ -23,12 +23,12 @@ class Term(DomainTerm):
         failed = geocoded_location.resolve(location, geocoder)
         if not failed:
             # successfully geocoded, add a relationship
-            self.success = True
-            relationship = ProbabilityRelation(self, geocoded_location)
+            relationship = ProbabilityRelation(self, geocoded_location,
+                                               "LOCATION")
             self.relationships.append(relationship)
         else:
             self.fail_message = failed
 # TODO : logging here
-            print "Given location '" + location + "' was not resolved."
+            print "Given location '" + location + "' was not resolved: " + failed
 
         return self

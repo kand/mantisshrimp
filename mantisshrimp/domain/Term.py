@@ -16,7 +16,5 @@ class Term(DomainObject):
         
         # raw input term used for geolocation
         self.raw_term = ''
-        # true if geocoder has successfully located this term
-        self.success = False
         # failure message if geocoder has failed to locate this term
         self.fail_message = ''

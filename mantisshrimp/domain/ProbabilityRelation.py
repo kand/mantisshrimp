@@ -7,8 +7,12 @@ class ProbabilityRelation(DomainObject):
         of their relationship being true.
         '''
 
-        def __init__(self, object1, object2):
+        def __init__(self, object1, object2, name):
+            DomainObject.__init__(self)
+
             # first object in the relation
             self.object1 = object1
             # second object in the relation
             self.object2 = object2
+            # name of this relationship
+            self.name = name

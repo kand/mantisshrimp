@@ -1,7 +1,9 @@
 import feedparser, geopy
 
+from mantisshrimp.databases.neo4j.Neo4j import *
 from mantisshrimp.parsing_engine import ContentSearchFunctions
 from mantisshrimp.parsing_engine.Article import *
+
 SOURCE = 'http://news.yahoo.com/rss/us'
 MAX_ARTICLES = 1
 MAX_LOCATIONS_TO_SEARCH = 4
@@ -30,8 +32,16 @@ for i in range(len(feed.entries)):
     docs.append(doc)
 
 # TODO : save docs to database
+db = Neo4j()
+def saveDomainObjectAndRelations(obj):
+    node1 = db.saveNode(obj)[0]
+    for rel in obj.relationships:
+        node2 = saveDomainObjectAndRelations(rel.object2)
+        db.saveRelation(node1, node2, rel)
+    return node1
+
 for doc in docs:
-    print doc.toDict()
+    saveDomainObjectAndRelations(doc)
 
 # TODO: start a flask webservice to allow results to be viewed
 #from mantisshrimp.webservice import app

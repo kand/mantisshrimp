@@ -28,8 +28,8 @@ class Location(DomainLocation):
 
             # no exceptions, set class variables
             self.place = geocode_result[0]
-            self.coords = DomainLocation.Coordinate(geocode_result[0][0],
-                                                    geocode_result[0][1])
+            self.latitude = geocode_result[1][0]
+            self.longitude = geocode_result[1][1]
             
         except Exception as e:
             # a failure occured, set variables as necessary
