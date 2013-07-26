@@ -7,13 +7,14 @@ from mantisshrimp.parsing_engine import ContentSearchFunctions
 from mantisshrimp.parsing_engine.Article import *
 
 SOURCE = 'http://news.yahoo.com/rss/us'
-MAX_ARTICLES = 1
+MAX_ARTICLES = 5
 MAX_LOCATIONS_TO_SEARCH = 4
 
 # get sample data
 feed = feedparser.parse(SOURCE)
 
 # search each entry in feed up to given amount
+db = Neo4j()
 docs = []
 articles_searched = 0
 for i in range(len(feed.entries)):
@@ -29,12 +30,12 @@ for i in range(len(feed.entries)):
     doc = Article(SOURCE, entry.link)
     doc.digest(ContentSearchFunctions.yahoo,
                MAX_LOCATIONS_TO_SEARCH,
-               geopy.geocoders.GoogleV3)
+               geopy.geocoders.GoogleV3,
+               db)
 
     docs.append(doc)
 
 # TODO : save docs to database
-db = Neo4j()
 def saveDomainObjectAndRelations(obj):
     node1 = db.processNode(obj)
     obj.id = node1._id

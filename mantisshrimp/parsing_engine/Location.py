@@ -7,6 +7,21 @@ class Location(DomainLocation):
     def __init__(self):
         DomainLocation.__init__(self)
 
+    def buildFromNode(self, node):
+        '''
+        Set properties from a node.
+        '''
+
+        props = node.get_properties()
+        self.id = node._id
+        self.geocoder_domain = props['geocoder_domain']
+        self.longitude = props['longitude']
+        self.latitude = props['latitude']
+        self.place = props['place']
+        self.likelyhood = props['likelyhood']
+
+        return self
+
     def resolve(self, location, geocoder):
         '''
         Resolve location with a geocoder. Returns a failure message if
@@ -20,18 +35,19 @@ class Location(DomainLocation):
         ready_geocoder = geocoder()
         self.geocoder_domain = ready_geocoder.domain
 
-# TODO : search db for this location, allow skip over geocoding
+# TODO : this method sucks, return self somehow
 # TODO : having multiple results for one location is an error, will not
 #   be tracked currently, this is incorrect behavior on my part
 
         try:
             # use geocoder to find data
-            geocode_result = ready_geocoder.geocode(location)
+# TODO : take multiple results and turn them all into lcoations
+            geocode_result = ready_geocoder.geocode(location, exactly_one=False)
 
             # no exceptions, set class variables
-            self.place = geocode_result[0]
-            self.latitude = geocode_result[1][0]
-            self.longitude = geocode_result[1][1]
+            self.place = geocode_result[0][0]
+            self.latitude = geocode_result[0][1][0]
+            self.longitude = geocode_result[0][1][1]
             
         except Exception as e:
             # a failure occured, set variables as necessary

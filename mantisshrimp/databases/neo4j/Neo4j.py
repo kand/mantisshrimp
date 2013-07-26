@@ -23,6 +23,26 @@ class Neo4j(object):
         self.relationships = self.conn.get_or_create_index(neo4j.Relationship,
                                                            "Relations")
 
+    def find(self, index_type, key, value):
+
+# TODO : this function sucks
+        db_object = None
+
+        try:
+            if index_type is "Articles":
+                db_object = self.articles.get(key, value)
+            elif index_type is "Terms":
+                db_object = self.terms.get(key, value)
+            elif index_type is "Locations":
+                db_object = self.locations.get(key, value)
+            elif index_type is "Relations":
+                db_object = self.relationships.get(key, value)
+        except Exception as e:
+            print "Failed finding object in index '%s' with k,v = ('%s','%s')" \
+                  % (index_type, key, value)
+        
+        return db_object
+
     def processNode(self, domain_object):
         
 # TODO : this function sucks

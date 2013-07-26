@@ -12,8 +12,22 @@ class Article(DomainArticle):
         
         self.source = source
         self.href = href
+
+    def buildFromNode(self, db_node):
+        '''
+        Set properties from a node.
+        '''
+
+        props = db_node.get_properties()
+        self.source = props['source']
+        self.stripped_content = props['stripped_content']
+        self.href = props['href']
+        self.likelyhood = props['likelyhood']
+
+        return self
         
-    def digest(self, content_search_function, num_locations_to_test, geocoder):
+    def digest(self, content_search_function, num_locations_to_test, geocoder,
+               db_conn):
         '''
         Open url provided at init time and attempt to grab content based
         on the given content_search_function.
@@ -29,7 +43,15 @@ class Article(DomainArticle):
             the geocoder.
 
         geocoder = the geocoder object to use to test locations.
+
+        db_conn = database connection to use to check for existing results.
         '''
+
+        # check db to see if this article has already been scanned
+        article_nodes = db_conn.find("Articles", "href", self.href)
+        if len(article_nodes) > 0:
+            self.buildFromNode(article_nodes[0])
+            return self
 
         # open url and get html
         response = urllib2.urlopen(self.href)
@@ -99,7 +121,7 @@ class Article(DomainArticle):
 
             # test location using geocoder
             term = Term()
-            term.find(location, geocoder)
+            term.find(location, geocoder, db_conn)
 # TODO : should keep terms that have failed
             relationship = ProbabilityRelation(self, term, "CONTAINS")
             self.relationships.append(relationship)

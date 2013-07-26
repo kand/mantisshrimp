@@ -19,8 +19,9 @@ class DomainObject(object):
     def toDict(self):
         ret_dict = self.__dict__.copy()
 
-        # remove relationships
+        # remove properties we don't need to save
         ret_dict.pop('relationships', None)
+        ret_dict.pop('key_name', None)
         
         # remove id string if it's empty
         if 'id' in ret_dict and len(ret_dict['id'].strip()) < 1:
