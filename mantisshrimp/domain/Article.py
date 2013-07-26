@@ -10,10 +10,12 @@ class Article(DomainObject):
 
     def __init__(self):
         DomainObject.__init__(self)
-        
+
+        # direct link to this article, should be unique identifier of this Article
+        self.href = ''
         # source this article was taken from
         self.source = ''
-        # direct link to this article
-        self.href = ''
         # stripped content used to search for terms
         self.stripped_content = ''
+
+        self.key_name = 'href'

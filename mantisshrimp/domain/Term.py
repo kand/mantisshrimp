@@ -14,7 +14,9 @@ class Term(DomainObject):
     def __init__(self):
         DomainObject.__init__(self)
         
-        # raw input term used for geolocation
+        # raw term for geolocation, should be unique identifier of this Term
         self.raw_term = ''
         # failure message if geocoder has failed to locate this term
         self.fail_message = ''
+
+        self.key_name = 'raw_term'

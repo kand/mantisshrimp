@@ -1,5 +1,7 @@
 import feedparser, geopy
 
+from py2neo import neo4j
+
 from mantisshrimp.databases.neo4j.Neo4j import *
 from mantisshrimp.parsing_engine import ContentSearchFunctions
 from mantisshrimp.parsing_engine.Article import *
@@ -34,10 +36,12 @@ for i in range(len(feed.entries)):
 # TODO : save docs to database
 db = Neo4j()
 def saveDomainObjectAndRelations(obj):
-    node1 = db.saveNode(obj)[0]
+    node1 = db.processNode(obj)
+    obj.id = node1._id
     for rel in obj.relationships:
         node2 = saveDomainObjectAndRelations(rel.object2)
-        db.saveRelation(node1, node2, rel)
+        db_rel = db.processRelation(node1, node2, rel)
+        rel.id = db_rel._id
     return node1
 
 for doc in docs:

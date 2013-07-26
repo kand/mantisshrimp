@@ -7,6 +7,8 @@ class DomainObject(object):
 # TODO : this put likelyhood default in app settings
 
     def __init__(self):
+        # name of the field used as a unique key, defaults to id
+        self.key_name = 'id'
         # unique id for this domain object
         self.id = ''
         # a probabilistic measure that this object is correct
