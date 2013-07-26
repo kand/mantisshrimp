@@ -7,8 +7,8 @@ from mantisshrimp.parsing_engine import ContentSearchFunctions
 from mantisshrimp.parsing_engine.Article import *
 
 SOURCE = 'http://news.yahoo.com/rss/us'
-MAX_ARTICLES = 5
-MAX_LOCATIONS_TO_SEARCH = 4
+MAX_ARTICLES = 10
+MAX_LOCATIONS_TO_SEARCH = 5
 
 # get sample data
 feed = feedparser.parse(SOURCE)
