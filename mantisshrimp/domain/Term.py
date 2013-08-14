@@ -10,6 +10,8 @@ class Term(DomainObject):
     - terms that probably better describe the location of this term
     - articles this term is found in
     '''
+
+    UNIQUE_ID = 'raw_term'
     
     def __init__(self):
         DomainObject.__init__(self)
@@ -19,4 +21,3 @@ class Term(DomainObject):
         # failure message if geocoder has failed to locate this term
         self.fail_message = ''
 
-        self.key_name = 'raw_term'

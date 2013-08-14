@@ -8,6 +8,8 @@ class Article(DomainObject):
     be used to assign one or many locations to this document.
     '''
 
+    UNIQUE_ID = 'href'
+
     def __init__(self):
         DomainObject.__init__(self)
 
@@ -17,5 +19,3 @@ class Article(DomainObject):
         self.source = ''
         # stripped content used to search for terms
         self.stripped_content = ''
-
-        self.key_name = 'href'

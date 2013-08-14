@@ -35,7 +35,7 @@ for i in range(len(feed.entries)):
 
     docs.append(doc)
 
-# TODO : save docs to database
+# save documents to d
 def saveDomainObjectAndRelations(obj):
     node1 = db.processNode(obj)
     obj.id = node1._id
@@ -45,8 +45,10 @@ def saveDomainObjectAndRelations(obj):
         rel.id = db_rel._id
     return node1
 
+i = 0
 for doc in docs:
     saveDomainObjectAndRelations(doc)
+    print('[mantisshrimp] saved doc ' + str(i) + ' ' + doc.href)
 
 # TODO: start a flask webservice to allow results to be viewed
 #from mantisshrimp.webservice import app

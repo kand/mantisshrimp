@@ -6,6 +6,8 @@ class Location(DomainObject):
     Locations are used to store information on potential locations for terms.
     '''
 
+    UNIQUE_ID = 'place'
+
     def __init__(self):
         DomainObject.__init__(self)
 
@@ -18,4 +20,3 @@ class Location(DomainObject):
         # logitude of location
         self.logitude = 0.0
 
-        self.key_name = 'place'

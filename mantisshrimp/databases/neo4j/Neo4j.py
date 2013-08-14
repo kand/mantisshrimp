@@ -6,22 +6,53 @@ from mantisshrimp.domain.Location import Location as DomainLocation
 
 class Neo4j(object):
 
-    def __init__(self):
+    CONN_STR = "http://%s:%d/db/%s/"
 
-# TODO : put stuff in app settings
-        HOST = "localhost"
-        PORT = 7474
-        DB_NAME = "data"
-        
-        self.conn = neo4j.GraphDatabaseService("http://%s:%d/db/%s/" \
-                                                % (HOST, PORT, DB_NAME))
+    class Indexes():
+        N_ARTICLES = "Articles"
+        N_TERMS = "Terms"
+        N_LOCATIONS = "Locations"
+        R_RELATIONS = "Relations"
+
+    class Relations():
+        CONTAINS = "CONTAINS"
+        LOCATIONS = "LOCATIONS"
+
+    def __init__(self, host='localhost', port=7474, db_name='data'):
+
+        # get connection
+        self.conn = neo4j.GraphDatabaseService(self.CONN_STR % (host, port, db_name))
 
         # build indexes
-        self.articles = self.conn.get_or_create_index(neo4j.Node, "Articles")
-        self.terms = self.conn.get_or_create_index(neo4j.Node, "Terms")
-        self.locations = self.conn.get_or_create_index(neo4j.Node, "Locations")
-        self.relationships = self.conn.get_or_create_index(neo4j.Relationship,
-                                                           "Relations")
+        self.articles = self.conn.get_or_create_index(
+            neo4j.Node,
+            self.Indexes.N_ARTICLES
+        )
+        self.terms = self.conn.get_or_create_index(
+            neo4j.Node,
+            self.Indexes.N_TERMS
+        )
+        self.locations = self.conn.get_or_create_index(
+            neo4j.Node,
+            self.Indexes.N_LOCATIONS
+        )
+        self.relationships = self.conn.get_or_create_index(
+            neo4j.Relationship,
+            self.Indexes.R_RELATIONS
+        )
+
+    def findArticle(href):
+        domain_article = None
+        
+        db_nodes = self.articles.get(DomainArticle.UNIQUE_ID, href)
+        if len(db_nodes) > 0:
+            props = db_nodes[0].get_properties()
+            domain_article = DomainArticle()
+            domain_article.href = props['href']
+            domain_article.source = props['source']
+            domain_article.stripped_content = props['stripped_content']
+
+        return domain_article
 
     def find(self, index_type, key, value):
 
@@ -29,13 +60,13 @@ class Neo4j(object):
         db_object = None
 
         try:
-            if index_type is "Articles":
+            if index_type is self.Indexes.N_ARTICLES:
                 db_object = self.articles.get(key, value)
-            elif index_type is "Terms":
+            elif index_type is self.Indexes.N_TERMS:
                 db_object = self.terms.get(key, value)
-            elif index_type is "Locations":
+            elif index_type is self.Indexes.N_LOCATIONS:
                 db_object = self.locations.get(key, value)
-            elif index_type is "Relations":
+            elif index_type is self.Indexes.R_RELATIONS:
                 db_object = self.relationships.get(key, value)
         except Exception as e:
             print "Failed finding object in index '%s' with k,v = ('%s','%s')" \
@@ -50,15 +81,15 @@ class Neo4j(object):
         new_node = None
         
         if isinstance(domain_object, DomainArticle):
-            new_node = self.articles.get_or_create(domain_object.key_name,
+            new_node = self.articles.get_or_create(domain_object.UNIQUE_ID,
                                                    domain_object.href,
                                                    domain_object.toDict())
         elif isinstance(domain_object, DomainTerm):
-            new_node = self.terms.get_or_create(domain_object.key_name,
+            new_node = self.terms.get_or_create(domain_object.UNIQUE_ID,
                                                 domain_object.raw_term,
                                                 domain_object.toDict())
         elif isinstance(domain_object, DomainLocation):
-            new_node = self.locations.get_or_create(domain_object.key_name,
+            new_node = self.locations.get_or_create(domain_object.UNIQUE_ID,
                                                    domain_object.place,
                                                    domain_object.toDict())
     

@@ -8,17 +8,9 @@ class Location(DomainLocation):
         DomainLocation.__init__(self)
 
     def buildFromNode(self, node):
-        '''
-        Set properties from a node.
-        '''
-
         props = node.get_properties()
-        self.id = node._id
-        self.geocoder_domain = props['geocoder_domain']
-        self.longitude = props['longitude']
-        self.latitude = props['latitude']
-        self.place = props['place']
-        self.likelyhood = props['likelyhood']
+        for name in props:
+            setattr(self, name, props[name])
 
         return self
 

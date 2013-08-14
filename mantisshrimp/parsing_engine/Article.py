@@ -1,9 +1,9 @@
 import bleach, bs4, json, nltk, operator, urllib2
 
+from mantisshrimp.databases.neo4j.Neo4j import *
+from mantisshrimp.domain.Article import Article as DomainArticle
 from mantisshrimp.domain.ProbabilityRelation import *
 from mantisshrimp.parsing_engine.Term import *
-
-from mantisshrimp.domain.Article import Article as DomainArticle
 
 class Article(DomainArticle):
 
@@ -13,19 +13,21 @@ class Article(DomainArticle):
         self.source = source
         self.href = href
 
-    def buildFromNode(self, db_node):
-        '''
-        Set properties from a node.
-        '''
+    def buildFromNode(self, node):
+        props = node.get_properties()
+        for name in props:
+            setattr(self, name, props[name])
 
-        props = db_node.get_properties()
-        self.source = props['source']
-        self.stripped_content = props['stripped_content']
-        self.href = props['href']
-        self.likelyhood = props['likelyhood']
+        term_relations = node.match(Neo4j.Relations.CONTAINS)
+        for relation in term_relations:
+            location = Term().buildFromNode(relation.end_node)
+            self.relationships.append(
+                ProbabilityRelation(self, location, Neo4j.Relations.CONTAINS))
 
         return self
-        
+
+# TODO : populate sub objects here ??
+
     def digest(self, content_search_function, num_locations_to_test, geocoder,
                db_conn):
         '''

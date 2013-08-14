@@ -7,3 +7,4 @@ TODOS
 - implement a term scoring engine, based on Bayes
 - implement heatmap with web service integration allowing for user interaction
 - use app settings from a settings file
+- Add dates to all objects for when they were added

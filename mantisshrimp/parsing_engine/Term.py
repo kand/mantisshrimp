@@ -1,5 +1,6 @@
 import geopy
 
+from mantisshrimp.databases.neo4j.Neo4j import *
 from mantisshrimp.domain.ProbabilityRelation import *
 from mantisshrimp.domain.Term import Term as DomainTerm
 from mantisshrimp.parsing_engine.Location import *
@@ -15,18 +16,15 @@ class Term(DomainTerm):
         '''
         
         props = node.get_properties()
-
-        self.id = node._id
-        self.raw_term = props['raw_term']
-        self.fail_message = props['fail_message']
-        self.likelyhood = props['likelyhood']
+        for name in props:
+            setattr(self, name, props[name])
 
         # try to get locations this may be already associated with
-        location_nodes = term_node.match("LOCATION")
-        for location_node in location_nodes:
-            location = Location().buildFromNode(location_node)
+        location_relations = node.match(Neo4j.Relations.LOCATIONS)
+        for relation in location_relations:
+            location = Location().buildFromNode(relation.end_node)
             self.relationships.append(
-                ProbabilityRelation(self, location, "LOCATION"))
+                ProbabilityRelation(self, location, Neo4j.Relations.LOCATIONS))
             
         return self
 

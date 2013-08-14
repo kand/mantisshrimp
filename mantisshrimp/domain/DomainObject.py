@@ -4,11 +4,13 @@ class DomainObject(object):
     DomainObject is the base for all other objects in this domain.
     '''
 
+    # name of the field used as a unique key, defaults to id
+    UNIQUE_ID = 'id'
+
 # TODO : this put likelyhood default in app settings
 
     def __init__(self):
-        # name of the field used as a unique key, defaults to id
-        self.key_name = 'id'
+        
         # unique id for this domain object
         self.id = ''
         # a probabilistic measure that this object is correct
@@ -24,7 +26,7 @@ class DomainObject(object):
         ret_dict.pop('key_name', None)
         
         # remove id string if it's empty
-        if 'id' in ret_dict and len(ret_dict['id'].strip()) < 1:
+        if 'id' in ret_dict and len(str(ret_dict['id']).strip()) < 1:
             ret_dict.pop('id', None)
         
         return ret_dict
